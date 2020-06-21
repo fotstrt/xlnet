@@ -333,7 +333,7 @@ class ImdbProcessor(DataProcessor):
     data = data.dropna()
 
     for _, row in data.iterrows():
-        examples.append(InputExample(guid="unused_id", text_a=row['Sentence'], text_b=None))
+        examples.append(InputExample(guid="unused_id", text_a=row['Sentence'], text_b=None, label=0))
     return examples
 
 
@@ -822,7 +822,7 @@ def main(_):
     eval_file = os.path.join(FLAGS.output_dir, eval_file_base)
 
     file_based_convert_examples_to_features(
-        eval_examples, None, FLAGS.max_seq_length, tokenize_fn,
+        eval_examples, label_list, FLAGS.max_seq_length, tokenize_fn,
         eval_file)
 
     pred_input_fn = file_based_input_fn_builder(

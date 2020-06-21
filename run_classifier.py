@@ -412,6 +412,7 @@ def file_based_convert_examples_to_features(
     examples *= num_passes
 
   for (ex_index, example) in enumerate(examples):
+    print(ex_index, example)
     if ex_index % 10000 == 0:
       tf.logging.info("Writing example {} of {}".format(ex_index,
                                                         len(examples)))

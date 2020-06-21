@@ -843,6 +843,8 @@ def main(_):
         else:
           raise NotImplementedError
 
+        print(label_out)
+
         fout.write("{}\t{}\n".format(pred_cnt, label_out))
 
     predict_json_path = os.path.join(predict_dir, "{}.logits.json".format(

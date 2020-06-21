@@ -28,6 +28,7 @@ from classifier_utils import PaddingInputExample
 from classifier_utils import convert_single_example
 from prepro_utils import preprocess_text, encode_ids
 
+import pandas as pd
 
 # Model
 flags.DEFINE_string("model_config_path", default=None,
@@ -297,7 +298,7 @@ class Yelp5Processor(DataProcessor):
 
 class ImdbProcessor(DataProcessor):
   def get_labels(self):
-    return ["neg", "pos"]
+    return [0, 1]
 
   def get_train_examples(self, data_dir):
     return self._create_examples(os.path.join(data_dir, "train"))
@@ -307,16 +308,13 @@ class ImdbProcessor(DataProcessor):
 
   def _create_examples(self, data_dir):
     examples = []
-    for label in ["neg", "pos"]:
-      cur_dir = os.path.join(data_dir, label)
-      for filename in tf.gfile.ListDirectory(cur_dir):
-        if not filename.endswith("txt"): continue
 
-        path = os.path.join(cur_dir, filename)
-        with tf.gfile.Open(path) as f:
-          text = f.read().strip().replace("<br />", " ")
-        examples.append(InputExample(
-            guid="unused_id", text_a=text, text_b=None, label=label))
+    data = pd.read_csv(data_dir, header=None,  index_col=0)
+    data.columns=["Label", "Sentence"]
+    data = data.dropna()
+    
+    for _, row in df.iterrows():
+        examples.append(InputExample(guid="unused_id", text_a=row['Sentence'], text_b=None, label=row['Label']))
     return examples
 
 

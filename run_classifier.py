@@ -69,6 +69,8 @@ flags.DEFINE_string("model_dir", default="",
       help="Directory for saving the finetuned model.")
 flags.DEFINE_string("data_dir", default="",
       help="Directory for input data.")
+flags.DEFINE_string("test_dir", default="",
+      help="Directory for test data.")
 
 # TPUs and machines
 flags.DEFINE_bool("use_tpu", default=False, help="whether to use TPU.")
@@ -305,6 +307,7 @@ class ImdbProcessor(DataProcessor):
     return self._create_examples(data_dir)
 
   def get_dev_examples(self, data_dir):
+    # return self._create_examples(os.path.join(data_dir, "test.csv"))
     return self._create_examples(data_dir)
 
   def _create_examples(self, data_dir):
@@ -314,7 +317,7 @@ class ImdbProcessor(DataProcessor):
     data.columns=["Label", "Sentence"]
     data = data.dropna()
 
-    for _, row in df.iterrows():
+    for _, row in data.iterrows():
         examples.append(InputExample(guid="unused_id", text_a=row['Sentence'], text_b=None, label=row['Label']))
     return examples
 

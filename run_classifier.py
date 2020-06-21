@@ -725,7 +725,7 @@ def main(_):
     tf.logging.info("Num of train samples: {}".format(len(train_examples)))
 
     file_based_convert_examples_to_features(
-        train_examples, label_list, FLAGS.max_seq_length, tokenize_fn,
+        train_examples, None, FLAGS.max_seq_length, tokenize_fn,
         train_file, FLAGS.num_passes)
 
     train_input_fn = file_based_input_fn_builder(

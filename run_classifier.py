@@ -843,7 +843,7 @@ def main(_):
         else:
           raise NotImplementedError
 
-        print(label_out)
+        #print(label_out)
 
         fout.write("{}\t{}\n".format(pred_cnt, label_out))
 

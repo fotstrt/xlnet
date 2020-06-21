@@ -325,7 +325,7 @@ class ImdbProcessor(DataProcessor):
         examples.append(InputExample(guid="unused_id", text_a=row['Sentence'], text_b=None, label=row['Label']))
     return examples
 
-   def _test_create_examples(self, data_dir):
+  def _test_create_examples(self, data_dir):
     examples = []
 
     data = pd.read_csv(data_dir, header=None,  index_col=0)

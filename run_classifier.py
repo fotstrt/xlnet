@@ -301,10 +301,11 @@ class ImdbProcessor(DataProcessor):
     return [0, 1]
 
   def get_train_examples(self, data_dir):
-    return self._create_examples(os.path.join(data_dir, "train"))
+    # return self._create_examples(os.path.join(data_dir, "train"))
+    return self._create_examples(data_dir)
 
   def get_dev_examples(self, data_dir):
-    return self._create_examples(os.path.join(data_dir, "test"))
+    return self._create_examples(data_dir)
 
   def _create_examples(self, data_dir):
     examples = []
@@ -312,7 +313,7 @@ class ImdbProcessor(DataProcessor):
     data = pd.read_csv(data_dir, header=None,  index_col=0)
     data.columns=["Label", "Sentence"]
     data = data.dropna()
-    
+
     for _, row in df.iterrows():
         examples.append(InputExample(guid="unused_id", text_a=row['Sentence'], text_b=None, label=row['Label']))
     return examples

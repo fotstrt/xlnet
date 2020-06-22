@@ -743,8 +743,8 @@ def main(_):
     #     model_fn=model_fn,
     #     config=run_config)
 
-    estimator = tf.estimator.Estimator(model_fn=model_fn, config=tf.estimator.RunConfig(model_dir='./my_model', save_summary_steps=FLAGS.save_checkpoint_steps,
-                save_checkpoints_steps=FLAGS.save_checkpoints_steps), params={"batch_size": FLAGS.train_batch_size})
+    estimator = tf.estimator.Estimator(model_fn=model_fn, config=tf.estimator.RunConfig(model_dir='./my_model', save_summary_steps=FLAGS.save_steps,
+                save_checkpoints_steps=FLAGS.save_steps), params={"batch_size": FLAGS.train_batch_size})
 
   if FLAGS.do_eval or FLAGS.do_predict:
     if FLAGS.eval_split == "dev":

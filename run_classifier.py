@@ -768,6 +768,22 @@ def main(_):
         train_examples, label_list, FLAGS.max_seq_length, tokenize_fn,
         train_file, FLAGS.num_passes)
 
+    while len(eval_examples) % FLAGS.eval_batch_size != 0:
+      eval_examples.append(PaddingInputExample())
+
+    eval_file_base = "{}.len-{}.{}.eval.tf_record".format(
+        spm_basename, FLAGS.max_seq_length, FLAGS.eval_split)
+    eval_file = os.path.join(FLAGS.output_dir, eval_file_base)
+
+    file_based_convert_examples_to_features(
+        eval_examples, label_list, FLAGS.max_seq_length, tokenize_fn,
+        eval_file)
+
+
+    assert len(eval_examples) % FLAGS.eval_batch_size == 0
+    eval_steps = int(len(eval_examples) // FLAGS.eval_batch_size)
+
+
     train_input_fn = file_based_input_fn_builder(
         input_file=train_file,
         seq_length=FLAGS.max_seq_length,

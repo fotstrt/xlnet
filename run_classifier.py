@@ -667,6 +667,18 @@ def get_model_fn(n_class):
 
   return model_fn
 
+def serving_input_fn():
+    label_ids   = tf.placeholder(tf.int32, [None], name='label_ids')
+    input_ids   = tf.placeholder(tf.int32, [None, FLAGS.max_seq_length], name='input_ids')
+    input_mask  = tf.placeholder(tf.int32, [None, FLAGS.max_seq_length], name='input_mask')
+    segment_ids = tf.placeholder(tf.int32, [None, FLAGS.max_seq_length], name='segment_ids')
+    input_fn = tf.estimator.export.build_raw_serving_input_receiver_fn({
+        'label_ids': label_ids,
+        'input_ids': input_ids,
+        'input_mask': input_mask,
+        'segment_ids': segment_ids,
+    })()
+    return input_fn
 
 def main(_):
   tf.logging.set_verbosity(tf.logging.INFO)
@@ -727,9 +739,20 @@ def main(_):
         predict_batch_size=FLAGS.predict_batch_size,
         eval_batch_size=FLAGS.eval_batch_size)
   else:
-    estimator = tf.estimator.Estimator(
-        model_fn=model_fn,
-        config=run_config)
+    # estimator = tf.estimator.Estimator(
+    #     model_fn=model_fn,
+    #     config=run_config)
+
+    estimator = tf.estimator.Estimator(model_fn=model_fn, config=tf.estimator.RunConfig(model_dir='./my_model', save_summary_steps=FLAGS.save_checkpoint_steps,
+                save_checkpoints_steps=FLAGS.save_checkpoints_steps), params={"batch_size": FLAGS.train_batch_size})
+
+  if FLAGS.do_eval or FLAGS.do_predict:
+    if FLAGS.eval_split == "dev":
+      eval_examples = processor.get_dev_examples(FLAGS.data_dir)
+    else:
+      eval_examples = processor.get_test_examples(FLAGS.data_dir)
+
+    tf.logging.info("Num of eval samples: {}".format(len(eval_examples)))
 
   if FLAGS.do_train:
     train_file_base = "{}.len-{}.train.tf_record".format(
@@ -751,15 +774,20 @@ def main(_):
         is_training=True,
         drop_remainder=True)
 
-    estimator.train(input_fn=train_input_fn, max_steps=FLAGS.train_steps)
+    eval_input_fn = file_based_input_fn_builder(
+        input_file=eval_file,
+        seq_length=FLAGS.max_seq_length,
+        is_training=False,
+        drop_remainder=True)
 
-  if FLAGS.do_eval or FLAGS.do_predict:
-    if FLAGS.eval_split == "dev":
-      eval_examples = processor.get_dev_examples(FLAGS.data_dir)
-    else:
-      eval_examples = processor.get_test_examples(FLAGS.data_dir)
+    train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=FLAGS.train_steps)
+    eval_spec = tf.estimator.EvalSpec(input_fn=eval_input_fn, steps=FLAGS.train_steps, exporters=exporter, start_delay_secs=0,  throttle_secs=5)                                 throttle_secs=5)
+    #estimator.train(input_fn=train_input_fn, max_steps=FLAGS.train_steps)
 
-    tf.logging.info("Num of eval samples: {}".format(len(eval_examples)))
+    exporter = tf.estimator.BestExporter(exports_to_keep=1, serving_input_receiver_fn=serving_input_fn)
+
+    tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
+
 
   if FLAGS.do_eval:
     # TPU requires a fixed batch size for all batches, therefore the number

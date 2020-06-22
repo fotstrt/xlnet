@@ -29,6 +29,8 @@ from classifier_utils import convert_single_example
 from prepro_utils import preprocess_text, encode_ids
 
 import pandas as pd
+from sklearn.model_selection import train_test_split
+
 
 # Model
 flags.DEFINE_string("model_config_path", default=None,

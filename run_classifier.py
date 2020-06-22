@@ -668,11 +668,11 @@ def get_model_fn(n_class):
   return model_fn
 
 def serving_input_fn():
-    label_ids   = tf.placeholder(tf.int64, [None], name='label_ids')
-    input_ids   = tf.placeholder(tf.int64, [None, FLAGS.max_seq_length], name='input_ids')
+    label_ids   = tf.placeholder(tf.int32, [None], name='label_ids')
+    input_ids   = tf.placeholder(tf.int32, [None, FLAGS.max_seq_length], name='input_ids')
     input_mask  = tf.placeholder(tf.float32, [None, FLAGS.max_seq_length], name='input_mask')
-    segment_ids = tf.placeholder(tf.int64, [None, FLAGS.max_seq_length], name='segment_ids')
-    is_real_example = tf.placeholder(tf.int64, [None], name='is_real_example')
+    segment_ids = tf.placeholder(tf.int32, [None, FLAGS.max_seq_length], name='segment_ids')
+    is_real_example = tf.placeholder(tf.int32, [None], name='is_real_example')
     input_fn = tf.estimator.export.build_raw_serving_input_receiver_fn({
         'label_ids': label_ids,
         'input_ids': input_ids,

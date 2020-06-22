@@ -308,7 +308,7 @@ class ImdbProcessor(DataProcessor):
 
   def get_dev_examples(self, data_dir):
     # return self._create_examples(os.path.join(data_dir, "test.csv"))
-    return self._create_examples(data_dir)
+    return self._create_eval_examples(data_dir)
 
   def get_test_examples(self, data_dir):
     # return self._create_examples(os.path.join(data_dir, "test.csv"))
@@ -320,6 +320,22 @@ class ImdbProcessor(DataProcessor):
     data = pd.read_csv(data_dir, header=None,  index_col=0)
     data.columns=["Label", "Sentence"]
     data = data.dropna()
+    data.drop_duplicates(subset ="Sentence", inplace = True)
+    data, _ = train_test_split(data, test_size=0.1, random_state=7)
+
+
+    for _, row in data.iterrows():
+        examples.append(InputExample(guid="unused_id", text_a=row['Sentence'], text_b=None, label=row['Label']))
+    return examples
+
+  def _create_eval_examples(self, data_dir):
+    examples = []
+
+    data = pd.read_csv(data_dir, header=None,  index_col=0)
+    data.columns=["Label", "Sentence"]
+    data = data.dropna()
+    data.drop_duplicates(subset ="Sentence", inplace = True)
+    _, data = train_test_split(data, test_size=0.1, random_state=7)
 
     for _, row in data.iterrows():
         examples.append(InputExample(guid="unused_id", text_a=row['Sentence'], text_b=None, label=row['Label']))

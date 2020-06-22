@@ -755,6 +755,9 @@ def main(_):
     tf.logging.info("Num of eval samples: {}".format(len(eval_examples)))
 
   if FLAGS.do_train:
+
+    eval_examples = processor.get_dev_examples(FLAGS.data_dir)
+
     train_file_base = "{}.len-{}.train.tf_record".format(
         spm_basename, FLAGS.max_seq_length)
     train_file = os.path.join(FLAGS.output_dir, train_file_base)
@@ -796,11 +799,11 @@ def main(_):
         is_training=False,
         drop_remainder=True)
 
+    exporter = tf.estimator.BestExporter(exports_to_keep=1, serving_input_receiver_fn=serving_input_fn)
+
     train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=FLAGS.train_steps)
     eval_spec = tf.estimator.EvalSpec(input_fn=eval_input_fn, steps=FLAGS.train_steps, exporters=exporter, start_delay_secs=0,  throttle_secs=5)
     #estimator.train(input_fn=train_input_fn, max_steps=FLAGS.train_steps)
-
-    exporter = tf.estimator.BestExporter(exports_to_keep=1, serving_input_receiver_fn=serving_input_fn)
 
     tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
 

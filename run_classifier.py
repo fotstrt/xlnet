@@ -670,7 +670,7 @@ def get_model_fn(n_class):
 def serving_input_fn():
     label_ids   = tf.placeholder(tf.int32, [None], name='label_ids')
     input_ids   = tf.placeholder(tf.int32, [None, FLAGS.max_seq_length], name='input_ids')
-    input_mask  = tf.placeholder(tf.int32, [None, FLAGS.max_seq_length], name='input_mask')
+    input_mask  = tf.placeholder(tf.float32, [None, FLAGS.max_seq_length], name='input_mask')
     segment_ids = tf.placeholder(tf.int32, [None, FLAGS.max_seq_length], name='segment_ids')
     input_fn = tf.estimator.export.build_raw_serving_input_receiver_fn({
         'label_ids': label_ids,

@@ -336,7 +336,7 @@ class ImdbProcessor(DataProcessor):
     data = pd.read_csv(data_dir, header=None,  index_col=0)
     data.columns=["Label", "Sentence"]
     data = data.dropna()
-    data.drop_duplicates(subset ="Sentence", inplace = True)
+    #data.drop_duplicates(subset ="Sentence", inplace = True)
     _, data = train_test_split(data, test_size=0.1, random_state=7)
 
     for _, row in data.iterrows():
